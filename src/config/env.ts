@@ -10,7 +10,7 @@ export const config = {
   jwtSecret: process.env.JWT_SECRET || 'your-super-secret-jwt-key',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
   bcryptRounds: parseInt(process.env.BCRYPT_ROUNDS || '12', 10),
-  corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  corsOrigin: '*',
   cloudinary: {
     cloudName: process.env.CLOUDINARY_CLOUD_NAME || '',
     apiKey: process.env.CLOUDINARY_API_KEY || '',

@@ -55,43 +55,33 @@ const siteSettingsSchema = new Schema<ISiteSettings>(
         type: String,
         required: [true, 'Hero section title is required'],
         trim: true,
-        maxlength: [100, 'Hero title cannot be longer than 100 characters'],
       },
       subtitle: {
-        type: String,
+        type: String, 
         required: [true, 'Hero section subtitle is required'],
         trim: true,
-        maxlength: [200, 'Hero subtitle cannot be longer than 200 characters'],
       },
       buttonText: {
         type: String,
-        trim: true,
-        maxlength: [30, 'Button text cannot be longer than 30 characters'],
         default: 'Get Started',
       },
     },
     aboutSectionText: {
       title: {
         type: String,
-        required: [true, 'About section title is required'],
         trim: true,
-        maxlength: [100, 'About title cannot be longer than 100 characters'],
       },
       content: {
         type: String,
-        required: [true, 'About section content is required'],
         trim: true,
-        maxlength: [1000, 'About content cannot be longer than 1000 characters'],
       },
       mission: {
         type: String,
         trim: true,
-        maxlength: [500, 'Mission text cannot be longer than 500 characters'],
       },
       vision: {
         type: String,
         trim: true,
-        maxlength: [500, 'Vision text cannot be longer than 500 characters'],
       },
     },
     aboutSectionImage: {

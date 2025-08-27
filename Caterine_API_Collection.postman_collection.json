@@ -1,0 +1,587 @@
+{
+	"info": {
+		"_postman_id": "caterine-api-collection",
+		"name": "Caterine API Collection",
+		"description": "Complete API collection for Caterine Express.js application with TypeScript, MongoDB, and Cloudinary integration",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health Checks",
+			"item": [
+				{
+					"name": "Server Root",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/",
+							"host": ["{{base_url}}"],
+							"path": [""]
+						}
+					}
+				},
+				{
+					"name": "API Root",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1"]
+						}
+					}
+				},
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/health",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "health"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "User Management",
+			"item": [
+				{
+					"name": "User Registration",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.token) {",
+									"        pm.environment.set('user_token', response.data.token);",
+									"        pm.environment.set('user_id', response.data.user.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": 1234567890,\n    \"password\": \"SecurePass123!\",\n    \"passwordConfirm\": \"SecurePass123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/register",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "users", "register"]
+						}
+					}
+				},
+				{
+					"name": "User Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.token) {",
+									"        pm.environment.set('user_token', response.data.token);",
+									"        pm.environment.set('user_id', response.data.user.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"john@example.com\",\n    \"password\": \"SecurePass123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "users", "login"]
+						}
+					}
+				},
+				{
+					"name": "Get User Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{user_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/profile",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "users", "profile"]
+						}
+					}
+				},
+				{
+					"name": "Update User Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{user_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Doe Updated\",\n    \"phone\": 9876543210\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/profile",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "users", "profile"]
+						}
+					}
+				},
+				{
+					"name": "Update User Password",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{user_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"currentPassword\": \"SecurePass123!\",\n    \"password\": \"NewSecurePass123!\",\n    \"passwordConfirm\": \"NewSecurePass123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/update-password",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "users", "update-password"]
+						}
+					}
+				},
+				{
+					"name": "User Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/logout",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "users", "logout"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin Management",
+			"item": [
+				{
+					"name": "Admin Setup (Initial)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.token) {",
+									"        pm.environment.set('admin_token', response.data.token);",
+									"        pm.environment.set('admin_id', response.data.admin.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Super Admin\",\n    \"email\": \"admin@caterine.com\",\n    \"password\": \"AdminPass123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin/setup",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "admin", "setup"]
+						}
+					}
+				},
+				{
+					"name": "Admin Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.token) {",
+									"        pm.environment.set('admin_token', response.data.token);",
+									"        pm.environment.set('admin_id', response.data.admin.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@caterine.com\",\n    \"password\": \"AdminPass123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "admin", "login"]
+						}
+					}
+				},
+				{
+					"name": "Get Admin Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin/profile",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "admin", "profile"]
+						}
+					}
+				},
+				{
+					"name": "Admin Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin/logout",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "admin", "logout"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Site Settings Management",
+			"item": [
+				{
+					"name": "Get Current Settings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin/settings",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "admin", "settings"]
+						}
+					}
+				},
+				{
+					"name": "Update General Settings",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"heroSectionText\": {\n        \"title\": \"Welcome to Our Amazing Platform\",\n        \"subtitle\": \"Discover incredible features and grow your business with us.\",\n        \"buttonText\": \"Get Started Now\"\n    },\n    \"contactInfo\": {\n        \"email\": \"contact@caterine.com\",\n        \"phone\": \"+1 (555) 987-6543\",\n        \"address\": \"456 Innovation Street, Tech City, TC 54321\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin/settings",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "admin", "settings"]
+						}
+					}
+				},
+				{
+					"name": "Update Hero Section",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Revolutionary Hero Title\",\n    \"subtitle\": \"Transform your business with our cutting-edge solutions.\",\n    \"buttonText\": \"Start Your Journey\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin/settings/hero-section",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "admin", "settings", "hero-section"]
+						}
+					}
+				},
+				{
+					"name": "Update About Section",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"About Our Revolutionary Company\",\n    \"content\": \"We are pioneers in delivering exceptional digital solutions that transform businesses worldwide.\",\n    \"mission\": \"To revolutionize the digital landscape through innovative technology.\",\n    \"vision\": \"A world where technology seamlessly enhances every business operation.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin/settings/about-section",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "admin", "settings", "about-section"]
+						}
+					}
+				},
+				{
+					"name": "Get Settings History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin/settings/history?page=1&limit=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "admin", "settings", "history"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Image Management",
+			"item": [
+				{
+					"name": "Upload Background Image",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": "",
+									"description": "Select a background image file (JPEG, PNG, or WebP, max 5MB)"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin/settings/background-image",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "admin", "settings", "background-image"]
+						}
+					}
+				},
+				{
+					"name": "Remove Background Image",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin/settings/background-image",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "admin", "settings", "background-image"]
+						}
+					}
+				},
+				{
+					"name": "Upload About Section Image",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": "",
+									"description": "Select an about section image file (JPEG, PNG, or WebP, max 5MB)"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin/settings/about-section-image",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "admin", "settings", "about-section-image"]
+						}
+					}
+				},
+				{
+					"name": "Remove About Section Image",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin/settings/about-section-image",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "admin", "settings", "about-section-image"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "user_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "admin_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "admin_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

@@ -47,7 +47,8 @@ class App {
     // CORS
     this.app.use(
       cors({
-        origin: config.corsOrigin,
+        // Allow all
+        origin: '*',
         credentials: true,
       })
     );
@@ -70,13 +71,7 @@ class App {
     this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
     // File upload middleware
-    this.app.use(fileUpload({
-      useTempFiles: true,
-      tempFileDir: '/tmp/',
-      limits: { fileSize: config.fileUpload.maxFileSize },
-      abortOnLimit: true,
-      responseOnLimit: 'File size limit exceeded',
-    }));
+    this.app.use(fileUpload());
 
     // Static files
     this.app.use(express.static('public'));
