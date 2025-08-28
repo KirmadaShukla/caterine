@@ -20,6 +20,23 @@ export interface ISiteSettings extends Document {
     url: string | null;
     fileId?: string | null;
   };
+  menuMainText?: {
+    title?: string;
+    content?: string;
+  };
+  menuMainImage?: {
+    url: string | null;
+    fileId?: string | null;
+  };
+  menuChildWithImage?: Array<{
+    title?: string;
+    content?: string;
+    price: number;
+    image?: {
+      url: string | null;
+      fileId?: string | null;
+    };
+  }>;
   contactInfo?: {
     email?: string;
     phone?: string;
@@ -56,7 +73,7 @@ const siteSettingsSchema = new Schema<ISiteSettings>(
         trim: true,
       },
       subtitle: {
-        type: String, 
+        type: String,
         required: [true, 'Hero section subtitle is required'],
         trim: true,
       },
@@ -93,12 +110,59 @@ const siteSettingsSchema = new Schema<ISiteSettings>(
         default: null,
       },
     },
+    menuMainText: {
+      title: {
+        type: String,
+        trim: true,
+      },
+      content: {
+        type: String,
+        trim: true,
+      }
+    },
+
+    menuMainImage: {
+      url: {
+        type: String,
+        default: null,
+      },
+      fileId: {
+        type: String,
+        default: null,
+      },
+    },
+
+    menuChildWithImage: [{
+      title: {
+        type: String,
+        trim: true,
+      },
+      content: {
+        type: String,
+        trim: true,
+      },
+      price: {
+        type: Number,
+        required: true,
+        min: [0, 'Price must be a positive number']
+      },
+      image: {
+        url: {
+          type: String,
+          default: null,
+        },
+        fileId: {
+          type: String,
+          default: null,
+        },
+      },
+    }],
     contactInfo: {
       email: {
         type: String,
         trim: true,
         validate: {
-          validator: function(value: string) {
+          validator: function (value: string) {
             return !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
           },
           message: 'Please provide a valid email address'
@@ -108,7 +172,7 @@ const siteSettingsSchema = new Schema<ISiteSettings>(
         type: String,
         trim: true,
         validate: {
-          validator: function(value: string) {
+          validator: function (value: string) {
             return !value || /^\+?[\d\s\-()]{7,20}$/.test(value);
           },
           message: 'Please provide a valid phone number'
@@ -124,22 +188,22 @@ const siteSettingsSchema = new Schema<ISiteSettings>(
       facebook: {
         type: String,
         trim: true,
-      
+
       },
       twitter: {
         type: String,
         trim: true,
-       
+
       },
       instagram: {
         type: String,
         trim: true,
-        
+
       },
       linkedin: {
         type: String,
         trim: true,
-       
+
       },
     },
     isActive: {

@@ -45,6 +45,23 @@ export interface SiteSettingsInput {
     url?: string | null;
     fileId?: string | null;
   };
+  menuMainText?: {
+    title?: string;
+    content?: string;
+  };
+  menuMainImage?: {
+    url?: string | null;
+    fileId?: string | null;
+  };
+  menuChildWithImage?: Array<{
+    title?: string;
+    content?: string;
+    price?: number;
+    image?: {
+      url?: string | null;
+      fileId?: string | null;
+    };
+  }>;
   contactInfo?: {
     email?: string;
     phone?: string;

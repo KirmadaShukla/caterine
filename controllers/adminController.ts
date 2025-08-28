@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { AdminService } from '../services/adminService';
+import { ImageService } from '../services/imageService';
 import { catchAsync } from '../utils/catchAsync';
 import { formatResponse } from '../utils/helpers';
 import { AppError } from '../utils/appError';
@@ -53,10 +54,10 @@ export class AdminController {
     );
   });
 
+  // Update site settings
   updateSettings = catchAsync(async (req: AuthenticatedAdminRequest, res: Response, next: NextFunction) => {
     const updateData: SiteSettingsInput = req.body;
     const adminId = req.admin._id.toString();
-    console.log(req.files)
     
     const settings = await AdminService.updateSiteSettings(adminId, updateData);
 
@@ -214,8 +215,154 @@ export class AdminController {
     );
   });
 
-  // // Update social media link
-  // updateSocialMediaLink=catchAsync(async(req:AuthenticatedAdminRequest,res:Response,next:NextFunction){
+  // Menu section controllers
+  updateMenuMainText = catchAsync(async (req: AuthenticatedAdminRequest, res: Response, next: NextFunction) => {
+    const { title, content } = req.body;
+    
+    const menuMainText = {
+      ...(title && { title }),
+      ...(content && { content }),
+    };
 
-  // })
+    const adminId = req.admin._id.toString();
+    const settings = await AdminService.updateSiteSettings(adminId, { menuMainText });
+
+    res.status(200).json(
+      formatResponse('success', 'Menu main text updated successfully', { settings })
+    );
+  });
+
+  uploadMenuMainImage = catchAsync(async (req: AuthenticatedAdminRequest, res: Response, next: NextFunction) => {
+    if (!req.files || !req.files.image) {
+      return next(new AppError('Please upload an image file', 400));
+    }
+
+    const imageFile = req.files.image as any;
+    const adminId = req.admin._id.toString();
+    
+    const settings = await AdminService.updateMenuMainImage(adminId, imageFile);
+
+    res.status(200).json(
+      formatResponse('success', 'Menu main image updated successfully', { settings })
+    );
+  });
+
+  removeMenuMainImage = catchAsync(async (req: AuthenticatedAdminRequest, res: Response, next: NextFunction) => {
+    const adminId = req.admin._id.toString();
+    const settings = await AdminService.removeMenuMainImage(adminId);
+
+    res.status(200).json(
+      formatResponse('success', 'Menu main image removed successfully', { settings })
+    );
+  });
+
+  addMenuChildItem = catchAsync(async (req: AuthenticatedAdminRequest, res: Response, next: NextFunction) => {
+    const { title, content, price } = req.body;
+    
+    if (!title || !content || price === undefined) {
+      return next(new AppError('Title, content, and price are required', 400));
+    }
+
+    const adminId = req.admin._id.toString();
+    
+    // Handle image upload if present
+    let imageData = null;
+    if (req.files && req.files.image) {
+      const imageFile = req.files.image as any;
+      const uploadResult = await ImageService.uploadImage(imageFile, 'caterine/menu-items');
+      imageData = {
+        url: uploadResult.url,
+        fileId: uploadResult.fileId,
+      };
+    }
+
+    const settings = await AdminService.addMenuChildItem(adminId, { title, content, price, image: imageData });
+
+    res.status(200).json(
+      formatResponse('success', 'Menu item added successfully', { settings })
+    );
+  });
+
+  updateMenuChildItem = catchAsync(async (req: AuthenticatedAdminRequest, res: Response, next: NextFunction) => {
+    const { itemIndex } = req.params;
+    const { title, content, price } = req.body;
+    
+    const index = parseInt(itemIndex);
+    if (isNaN(index) || index < 0) {
+      return next(new AppError('Invalid item index', 400));
+    }
+
+    const adminId = req.admin._id.toString();
+    
+    // Handle image upload if present
+    let imageData = undefined;
+    if (req.files && req.files.image) {
+      const imageFile = req.files.image as any;
+      const uploadResult = await ImageService.uploadImage(imageFile, 'caterine/menu-items');
+      imageData = {
+        url: uploadResult.url,
+        fileId: uploadResult.fileId,
+      };
+    }
+
+    const settings = await AdminService.updateMenuChildItem(adminId, index, { title, content, price, image: imageData });
+
+    res.status(200).json(
+      formatResponse('success', 'Menu item updated successfully', { settings })
+    );
+  });
+
+  uploadMenuChildImage = catchAsync(async (req: AuthenticatedAdminRequest, res: Response, next: NextFunction) => {
+    const { itemIndex } = req.params;
+    
+    if (!req.files || !req.files.image) {
+      return next(new AppError('Please upload an image file', 400));
+    }
+
+    const index = parseInt(itemIndex);
+    if (isNaN(index) || index < 0) {
+      return next(new AppError('Invalid item index', 400));
+    }
+
+    const imageFile = req.files.image as any;
+    const adminId = req.admin._id.toString();
+    
+    const settings = await AdminService.updateMenuChildImage(adminId, index, imageFile);
+
+    res.status(200).json(
+      formatResponse('success', 'Menu item image updated successfully', { settings })
+    );
+  });
+
+  removeMenuChildImage = catchAsync(async (req: AuthenticatedAdminRequest, res: Response, next: NextFunction) => {
+    const { itemIndex } = req.params;
+    
+    const index = parseInt(itemIndex);
+    if (isNaN(index) || index < 0) {
+      return next(new AppError('Invalid item index', 400));
+    }
+
+    const adminId = req.admin._id.toString();
+    const settings = await AdminService.removeMenuChildImage(adminId, index);
+
+    res.status(200).json(
+      formatResponse('success', 'Menu item image removed successfully', { settings })
+    );
+  });
+
+  deleteMenuChildItem = catchAsync(async (req: AuthenticatedAdminRequest, res: Response, next: NextFunction) => {
+    const { itemIndex } = req.params;
+    
+    const index = parseInt(itemIndex);
+    if (isNaN(index) || index < 0) {
+      return next(new AppError('Invalid item index', 400));
+    }
+
+    const adminId = req.admin._id.toString();
+    const settings = await AdminService.deleteMenuChildItem(adminId, index);
+
+    res.status(200).json(
+      formatResponse('success', 'Menu item deleted successfully', { settings })
+    );
+  });
 }

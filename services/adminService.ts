@@ -143,7 +143,10 @@ export class AdminService {
       Object.keys(updateData).forEach(key => {
         const value = updateData[key as keyof SiteSettingsInput];
         if (value !== undefined) {
-          if (typeof value === 'object' && value !== null) {
+          if (key === 'menuChildWithImage' && Array.isArray(value)) {
+            // Handle menuChildWithImage array
+            (settings as any)[key] = value;
+          } else if (typeof value === 'object' && value !== null) {
             // Handle nested objects (heroSectionText, aboutSectionText, etc.)
             const currentValue = settings![key as keyof ISiteSettings];
             if (typeof currentValue === 'object' && currentValue !== null) {
@@ -346,6 +349,241 @@ export class AdminService {
       url: null,
       fileId: null,
     };
+    settings.updatedBy = adminId as any;
+    await settings.save();
+
+    await settings.populate('updatedBy', 'name email');
+    return settings;
+  }
+
+  /**
+   * Update menu main image
+   */
+  static async updateMenuMainImage(adminId: string, file: UploadedFile): Promise<ISiteSettings> {
+    // Validate file
+    ImageService.validateImageFile(file);
+
+    // Get current settings
+    const settings = await SiteSettings.findOne({ isActive: true });
+    if (!settings) {
+      throw new AppError('Site settings not found', 404);
+    }
+
+    // Delete previous image if it exists
+    if (settings.menuMainImage?.fileId) {
+      await ImageService.deleteImage(settings.menuMainImage.fileId);
+    }
+
+    // Upload new image
+    const uploadResult = await ImageService.uploadImage(file, 'caterine/menu-main');
+
+    // Update settings
+    settings.menuMainImage = {
+      url: uploadResult.url,
+      fileId: uploadResult.fileId,
+    };
+    settings.updatedBy = adminId as any;
+    await settings.save();
+
+    await settings.populate('updatedBy', 'name email');
+    return settings;
+  }
+
+  /**
+   * Remove menu main image
+   */
+  static async removeMenuMainImage(adminId: string): Promise<ISiteSettings> {
+    const settings = await SiteSettings.findOne({ isActive: true });
+    if (!settings) {
+      throw new AppError('Site settings not found', 404);
+    }
+
+    // Delete image from Cloudinary if it exists
+    if (settings.menuMainImage?.fileId) {
+      await ImageService.deleteImage(settings.menuMainImage.fileId);
+    }
+
+    // Reset to null
+    settings.menuMainImage = {
+      url: null,
+      fileId: null,
+    };
+    settings.updatedBy = adminId as any;
+    await settings.save();
+
+    await settings.populate('updatedBy', 'name email');
+    return settings;
+  }
+
+  /**
+   * Add menu child item
+   */
+  static async addMenuChildItem(
+    adminId: string, 
+    itemData: { title: string; content: string; price: number; image?: { url: string; fileId: string } | null }
+  ): Promise<ISiteSettings> {
+    const settings = await SiteSettings.findOne({ isActive: true });
+    if (!settings) {
+      throw new AppError('Site settings not found', 404);
+    }
+
+    // Initialize menuChildWithImage if it doesn't exist
+    if (!settings.menuChildWithImage) {
+      settings.menuChildWithImage = [];
+    }
+
+    // Add new item
+    settings.menuChildWithImage.push({
+      title: itemData.title,
+      content: itemData.content,
+      price: itemData.price,
+      image: itemData.image || {
+        url: null,
+        fileId: null,
+      },
+    });
+
+    settings.updatedBy = adminId as any;
+    await settings.save();
+
+    await settings.populate('updatedBy', 'name email');
+    return settings;
+  }
+
+  /**
+   * Update menu child item
+   */
+  static async updateMenuChildItem(
+    adminId: string,
+    itemIndex: number,
+    itemData: { title?: string; content?: string; price?: number; image?: { url: string; fileId: string } }
+  ): Promise<ISiteSettings> {
+    const settings = await SiteSettings.findOne({ isActive: true });
+    if (!settings) {
+      throw new AppError('Site settings not found', 404);
+    }
+
+    if (!settings.menuChildWithImage || !settings.menuChildWithImage[itemIndex]) {
+      throw new AppError('Menu item not found', 404);
+    }
+
+    // Delete previous image if new image is being uploaded
+    if (itemData.image && settings.menuChildWithImage[itemIndex].image?.fileId) {
+      await ImageService.deleteImage(settings.menuChildWithImage[itemIndex].image!.fileId!);
+    }
+
+    // Update item data
+    if (itemData.title !== undefined) {
+      settings.menuChildWithImage[itemIndex].title = itemData.title;
+    }
+    if (itemData.content !== undefined) {
+      settings.menuChildWithImage[itemIndex].content = itemData.content;
+    }
+    if (itemData.price !== undefined) {
+      settings.menuChildWithImage[itemIndex].price = itemData.price;
+    }
+    if (itemData.image !== undefined) {
+      settings.menuChildWithImage[itemIndex].image = itemData.image;
+    }
+
+    settings.updatedBy = adminId as any;
+    await settings.save();
+
+    await settings.populate('updatedBy', 'name email');
+    return settings;
+  }
+
+  /**
+   * Update menu child item image
+   */
+  static async updateMenuChildImage(
+    adminId: string,
+    itemIndex: number,
+    file: UploadedFile
+  ): Promise<ISiteSettings> {
+    // Validate file
+    ImageService.validateImageFile(file);
+
+    // Get current settings
+    const settings = await SiteSettings.findOne({ isActive: true });
+    if (!settings) {
+      throw new AppError('Site settings not found', 404);
+    }
+
+    if (!settings.menuChildWithImage || !settings.menuChildWithImage[itemIndex]) {
+      throw new AppError('Menu item not found', 404);
+    }
+
+    // Delete previous image if it exists
+    if (settings.menuChildWithImage[itemIndex].image?.fileId) {
+      await ImageService.deleteImage(settings.menuChildWithImage[itemIndex].image!.fileId!);
+    }
+
+    // Upload new image
+    const uploadResult = await ImageService.uploadImage(file, 'caterine/menu-items');
+
+    // Update settings
+    settings.menuChildWithImage[itemIndex].image = {
+      url: uploadResult.url,
+      fileId: uploadResult.fileId,
+    };
+    settings.updatedBy = adminId as any;
+    await settings.save();
+
+    await settings.populate('updatedBy', 'name email');
+    return settings;
+  }
+
+  /**
+   * Remove menu child item image
+   */
+  static async removeMenuChildImage(adminId: string, itemIndex: number): Promise<ISiteSettings> {
+    const settings = await SiteSettings.findOne({ isActive: true });
+    if (!settings) {
+      throw new AppError('Site settings not found', 404);
+    }
+
+    if (!settings.menuChildWithImage || !settings.menuChildWithImage[itemIndex]) {
+      throw new AppError('Menu item not found', 404);
+    }
+
+    // Delete image from Cloudinary if it exists
+    if (settings.menuChildWithImage[itemIndex].image?.fileId) {
+      await ImageService.deleteImage(settings.menuChildWithImage[itemIndex].image!.fileId!);
+    }
+
+    // Reset image to null
+    settings.menuChildWithImage[itemIndex].image = {
+      url: null,
+      fileId: null,
+    };
+    settings.updatedBy = adminId as any;
+    await settings.save();
+
+    await settings.populate('updatedBy', 'name email');
+    return settings;
+  }
+
+  /**
+   * Delete menu child item
+   */
+  static async deleteMenuChildItem(adminId: string, itemIndex: number): Promise<ISiteSettings> {
+    const settings = await SiteSettings.findOne({ isActive: true });
+    if (!settings) {
+      throw new AppError('Site settings not found', 404);
+    }
+
+    if (!settings.menuChildWithImage || !settings.menuChildWithImage[itemIndex]) {
+      throw new AppError('Menu item not found', 404);
+    }
+
+    // Delete image from Cloudinary if it exists
+    if (settings.menuChildWithImage[itemIndex].image?.fileId) {
+      await ImageService.deleteImage(settings.menuChildWithImage[itemIndex].image!.fileId!);
+    }
+
+    // Remove item from array
+    settings.menuChildWithImage.splice(itemIndex, 1);
     settings.updatedBy = adminId as any;
     await settings.save();
 

@@ -43,6 +43,18 @@ router.put('/settings/about-section', adminController.updateAboutSection);
 router.put('/settings/about-section-image', adminController.uploadAboutSectionImage);
 router.delete('/settings/about-section-image', adminController.removeAboutSectionImage);
 
+// Menu main section routes (separate)
+router.put('/settings/menu-main-text', adminController.updateMenuMainText);
+router.put('/settings/menu-main-image', adminController.uploadMenuMainImage);
+router.delete('/settings/menu-main-image', adminController.removeMenuMainImage);
+
+// Menu child items routes (unified - combines text and image)
+router.post('/settings/menu-items', adminController.addMenuChildItem);
+router.put('/settings/menu-items/:itemIndex', adminController.updateMenuChildItem);
+router.delete('/settings/menu-items/:itemIndex', adminController.deleteMenuChildItem);
+
+router.put('/settings/menu-items/:itemIndex/image', adminController.uploadMenuChildImage);
+router.delete('/settings/menu-items/:itemIndex/image', adminController.removeMenuChildImage);
 // Social medial route
 // router.post('/update-link',adminController.updateSocialMediaLinks)
 export default router;
