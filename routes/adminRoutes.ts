@@ -7,6 +7,7 @@ import {
   validateSiteSettings,
   validateMongoId,
   validatePagination,
+
 } from '../middleware/validation';
 import { authLimiter } from '../middleware/rateLimiter';
 
@@ -42,4 +43,6 @@ router.put('/settings/about-section', adminController.updateAboutSection);
 router.put('/settings/about-section-image', adminController.uploadAboutSectionImage);
 router.delete('/settings/about-section-image', adminController.removeAboutSectionImage);
 
+// Social medial route
+// router.post('/update-link',adminController.updateSocialMediaLinks)
 export default router;

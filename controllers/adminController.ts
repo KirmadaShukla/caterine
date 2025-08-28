@@ -56,6 +56,7 @@ export class AdminController {
   updateSettings = catchAsync(async (req: AuthenticatedAdminRequest, res: Response, next: NextFunction) => {
     const updateData: SiteSettingsInput = req.body;
     const adminId = req.admin._id.toString();
+    console.log(req.files)
     
     const settings = await AdminService.updateSiteSettings(adminId, updateData);
 
@@ -212,4 +213,9 @@ export class AdminController {
       formatResponse('success', 'About section image removed successfully', { settings })
     );
   });
+
+  // // Update social media link
+  // updateSocialMediaLink=catchAsync(async(req:AuthenticatedAdminRequest,res:Response,next:NextFunction){
+
+  // })
 }

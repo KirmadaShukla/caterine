@@ -42,7 +42,6 @@ const siteSettingsSchema = new Schema<ISiteSettings>(
     backgroundImage: {
       url: {
         type: String,
-        required: [true, 'Background image URL is required'],
         default: 'default-bg.jpg',
       },
       fileId: {
@@ -125,42 +124,22 @@ const siteSettingsSchema = new Schema<ISiteSettings>(
       facebook: {
         type: String,
         trim: true,
-        validate: {
-          validator: function(value: string) {
-            return !value || /^https?:\/\/(www\.)?facebook\.com\/.*/.test(value);
-          },
-          message: 'Please provide a valid Facebook URL'
-        }
+      
       },
       twitter: {
         type: String,
         trim: true,
-        validate: {
-          validator: function(value: string) {
-            return !value || /^https?:\/\/(www\.)?(twitter|x)\.com\/.*/.test(value);
-          },
-          message: 'Please provide a valid Twitter/X URL'
-        }
+       
       },
       instagram: {
         type: String,
         trim: true,
-        validate: {
-          validator: function(value: string) {
-            return !value || /^https?:\/\/(www\.)?instagram\.com\/.*/.test(value);
-          },
-          message: 'Please provide a valid Instagram URL'
-        }
+        
       },
       linkedin: {
         type: String,
         trim: true,
-        validate: {
-          validator: function(value: string) {
-            return !value || /^https?:\/\/(www\.)?linkedin\.com\/.*/.test(value);
-          },
-          message: 'Please provide a valid LinkedIn URL'
-        }
+       
       },
     },
     isActive: {

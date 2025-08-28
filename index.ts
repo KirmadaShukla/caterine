@@ -71,7 +71,12 @@ class App {
     this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
     // File upload middleware
-    this.app.use(fileUpload());
+    this.app.use(fileUpload({
+      useTempFiles: false,
+      limits: { fileSize: config.fileUpload.maxFileSize },
+      abortOnLimit: true,
+      responseOnLimit: 'File size too large. Maximum size is ${config.fileUpload.maxFileSize / 1024 / 1024}MB'
+    }));
 
     // Static files
     this.app.use(express.static('public'));

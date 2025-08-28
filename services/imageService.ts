@@ -17,6 +17,16 @@ export class ImageService {
     folder: string = 'caterine'
   ): Promise<ImageUploadResult> {
     try {
+
+      // Validate file object
+      if (!file) {
+        throw new AppError('No file uploaded', 400);
+      }
+      
+      if (!file.name || !file.mimetype || !file.size) {
+        throw new AppError('Invalid file information', 400);
+      }
+      
       // Validate file type
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
       if (!allowedTypes.includes(file.mimetype)) {
@@ -30,9 +40,18 @@ export class ImageService {
           400
         );
       }
-
-      // Upload to Cloudinary
-      const uploadResult = await cloudinary.uploader.upload(file.tempFilePath, {
+      
+      // For direct upload from memory, we need to convert the file data to base64
+      // Note: This requires Cloudinary's SDK to support base64 uploads
+      if (!file.data) {
+        throw new AppError('File data not available', 500);
+      }
+      
+      // Convert buffer to base64
+      const base64Data = file.data.toString('base64');
+      
+      // Upload to Cloudinary using base64 data
+      const uploadResult = await cloudinary.uploader.upload(`data:${file.mimetype};base64,${base64Data}`, {
         folder: folder,
         resource_type: 'image',
         transformation: [
@@ -46,10 +65,29 @@ export class ImageService {
         fileId: uploadResult.public_id,
       };
     } catch (error: any) {
+      // Log more detailed error information for debugging
+      console.error('Cloudinary upload error details:', {
+        error: error,
+        errorMessage: error.message,
+        errorStack: error.stack,
+        file: {
+          name: file.name,
+          size: file.size,
+          mimetype: file.mimetype,
+          hasData: !!file.data
+        }
+      });
+      
       if (error instanceof AppError) {
         throw error;
       }
-      throw new AppError(`Image upload failed: ${error.message}`, 500);
+      
+      // Add more specific error messages based on Cloudinary error codes if available
+      const errorMessage = error.http_code === 401 
+        ? 'Cloudinary authentication failed. Please check your Cloudinary credentials.'
+        : error.message || 'Image upload failed';
+        
+      throw new AppError(errorMessage, error.http_code || 500);
     }
   }
 

@@ -6,6 +6,7 @@ cloudinary.config({
   cloud_name: config.cloudinary.cloudName,
   api_key: config.cloudinary.apiKey,
   api_secret: config.cloudinary.apiSecret,
+  secure: config.nodeEnv !== 'development' // Use secure connections except in development
 });
 
 export default cloudinary;
